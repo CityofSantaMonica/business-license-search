@@ -1,0 +1,32 @@
+{
+  "name": "business-license-search",
+  "version": "1.0.0",
+  "description": "Search Santa Monica's Business License information",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CityofSantaMonica/business-license-search.git"
+  },
+  "keywords": [
+    "business license",
+    "open data",
+    "socrata"
+  ],
+  "author": "City of Santa Monica",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CityofSantaMonica/business-license-search/issues"
+  },
+  "homepage": "https://github.com/CityofSantaMonica/business-license-search#readme",
+  "dependencies": {
+    "ng-csv": "^0.3.6",
+    "ng-table": "^2.1.0"
+  },
+  "devDependencies": {
+    "angular": "^1.5.8",
+    "gulp": "^3.9.1"
+  }
+}
