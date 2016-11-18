@@ -16,11 +16,11 @@ var src = [
 var settings = ["src/settings.js"];
 
 var vendor = [
-    "node_modules/angular/angular.js",
-    "node_modules/angular-route/angular-route.js",
-    "node_modules/angular-sanitize/angular-sanitize.js",
-    "node_modules/ng-csv/build/ng-csv.js",
-    "node_modules/ng-table/bundles/ng-table.js",
+    "node_modules/angular/angular.min.js",
+    "node_modules/angular-route/angular-route.min.js",
+    "node_modules/angular-sanitize/angular-sanitize.min.js",
+    "node_modules/ng-csv/build/ng-csv.min.js",
+    "node_modules/ng-table/bundles/ng-table.min.js",
 ];
 
 var dest = "dist/";
@@ -53,6 +53,12 @@ gulp.task("templates", function() {
         .pipe(gulp.dest(dest))
         .pipe(uglify())
         .pipe(rename({ extname: ".min.js" }))
+        .pipe(gulp.dest(dest));
+});
+
+gulp.task("vendor", function() {
+    return gulp.src(vendor)
+        .pipe(concat("business-license-search.vendor.js"))
         .pipe(gulp.dest(dest));
 });
 
