@@ -1,7 +1,13 @@
-﻿<h2>Search the Directory</h2>
+﻿<p class="alert alert-info fade in" ng-hide="vm.ready || vm.error">
+    <span class="glyphicon glyphicon-refresh glyphicon-spin"></span> Loading data (this may take up to 30 seconds)...
+</p>
 
-<p class="alert alert-info" ng-hide="vm.ready">
-    <span class="glyphicon glyphicon-refresh glyphicon-spin"></span>Loading data (this may take up to 30 seconds)...
+<p class="alert alert-warning" ng-show="vm.results && vm.results.length == 0">
+    No results match your search.
+</p>
+
+<p class="alert alert-danger fade in" ng-show="vm.error">
+    Error loading data. Please try again later.
 </p>
 
 <div class="form" ng-show="vm.ready">
@@ -52,7 +58,3 @@
         </tr>
     </table>
 </div>
-
-<p class="alert alert-warning" ng-show="vm.results && vm.results.length == 0">
-    No results match your search.
-</p>

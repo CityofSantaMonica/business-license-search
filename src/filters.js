@@ -10,7 +10,7 @@
     .filter("replace", replace);
 
   //filter the given array for items with a (partial) matching id
-  function byId(){
+  function byId() {
     return function(inputs, id) {
       if (id.length < 1)
         return inputs;
@@ -22,7 +22,7 @@
   }
 
   //filter the given array for items with a (partial) matching dba
-  function byDba(){
+  function byDba() {
     return function(inputs, dba) {
       if (dba.length < 1)
         return inputs;

@@ -3,9 +3,14 @@
 
   angular
     .module("businessLicenseSearch")
-    .controller("SearchController", ["BusinessLicenseRecords", "$filter", "ngTableParams", SearchController]);
+    .controller("SearchController", [
+      "BusinessLicenseRecords",
+      "$filter",
+      "NgTableParams",
+      SearchController
+    ]);
 
-  function SearchController(BusinessLicenseRecords, $filter, ngTableParams) {
+  function SearchController(BusinessLicenseRecords, $filter, NgTableParams) {
     //alias 'this' for more intuitive front-end access
     var vm = this;
     //viewmodel for the search form
@@ -14,6 +19,7 @@
     vm.address = "";
     vm.category = "";
     vm.ready = false;
+    vm.error = false;
     //the local data cache
     vm.records = undefined;
     //the local data cache of unique business categories
@@ -48,35 +54,39 @@
     };
     
     //called as the controller initializes
-    BusinessLicenseRecords.load(function(records) {
-      vm.categories = records.reduce(function(prev, current) {
-        if (prev.indexOf(current.business_type) < 0) {
-          prev.push(current.business_type);
-        }
-        return prev;
-      }, []).sort();
+    BusinessLicenseRecords.load().then(
+      function success(response) {
+        vm.records = response.data;
 
-      vm.records = records;
+        vm.categories = vm.records.reduce(function(prev, current) {
+          if (prev.indexOf(current.business_type) < 0) {
+            prev.push(current.business_type);
+          }
+          return prev;
+        }, []).sort();
 
-      //see https://github.com/esvit/ng-table/wiki/Configuring-your-table-with-ngTableParams
-      vm.tableParams = new ngTableParams({
-        count: 0,
-        sorting: {
-          dba: "asc"
-        }
-      }, {
-        counts: [],
-        total: (vm.results || []).length,
-        getData: function($defer, params) {
-          var orderedData = params.sorting()
-             ? $filter("orderBy")(vm.results, params.orderBy())
-             : vm.results
+        vm.tableParams = new NgTableParams({
+          count: 0,
+          sorting: {
+            dba: "asc"
+          }
+        }, {
+          counts: [],
+          total: (vm.results || []).length,
+          getData: function($defer, params) {
+            var orderedData = params.sorting()
+              ? $filter("orderBy")(vm.results, params.orderBy())
+              : vm.results
 
-          $defer.resolve(orderedData);
-        }
-      });
+            $defer.resolve(orderedData);
+          }
+        });
 
-      vm.ready = true;
-    });
+        vm.ready = true;
+      },
+      function error(response) {
+        vm.error = true;
+      }
+    );
   }
 })();

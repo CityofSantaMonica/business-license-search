@@ -4,8 +4,8 @@
   angular
     .module("businessLicenseSearch", [
         "businessLicenseSearch.settings",
+        "businessLicenseSearch.templates",
         "ngCsv",
-        "ngResource",
         "ngRoute",
         "ngTable"
     ])
