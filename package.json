@@ -23,12 +23,14 @@
   "homepage": "https://github.com/CityofSantaMonica/business-license-search#readme",
   "devDependencies": {
     "angular": "^1.5.8",
+    "angular-route": "^1.5.8",
+    "angular-sanitize": "^1.5.8",
+    "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-html2js": "^0.4.2",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^2.0.0",
-    "merge-stream": "^1.0.0",
     "ng-csv": "^0.3.6",
     "ng-table": "^2.1.0"
   }
