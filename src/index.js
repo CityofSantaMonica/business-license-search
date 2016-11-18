@@ -3,6 +3,7 @@
 
   angular
     .module("businessLicenseSearch", [
+        "businessLicenseSearch.settings",
         "ngCsv",
         "ngResource",
         "ngRoute",

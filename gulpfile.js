@@ -9,8 +9,11 @@ var gulp = require("gulp"),
 
 var src = [
     "src/index.js",
-    "src/*.js"
+    "src/*.js",
+    "!src/settings.js"
 ];
+
+var settings = ["src/settings.js"];
 
 var vendor = [
     "node_modules/angular/angular.js",
@@ -22,7 +25,7 @@ var vendor = [
 
 var dest = "dist/";
 
-gulp.task("scripts", function() {
+gulp.task("src", function() {
     return gulp.src(src)
         .pipe(concat("business-license-search.js"))
         .pipe(gulp.dest(dest))
@@ -31,9 +34,9 @@ gulp.task("scripts", function() {
         .pipe(gulp.dest(dest));
 });
 
-gulp.task("scripts-packaged", function() {
-    return gulp.src(vendor.concat(src))
-        .pipe(concat("business-license-search.packaged.js"))
+gulp.task("settings", function() {
+    return gulp.src(settings)
+        .pipe(concat("business-license-search.settings.js"))
         .pipe(gulp.dest(dest))
         .pipe(uglify())
         .pipe(rename({ extname: ".min.js" }))
@@ -53,7 +56,7 @@ gulp.task("templates", function() {
         .pipe(gulp.dest(dest));
 });
 
-gulp.task("build", ["scripts", "scripts-packaged", "templates"]);
+gulp.task("build", ["src", "settings", "templates", "vendor"]);
 
 gulp.task("clean", function() { return del(dest + "*"); });
 
