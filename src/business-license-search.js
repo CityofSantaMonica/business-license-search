@@ -5,14 +5,14 @@
     .module("businessLicenseSearch")
     .component("businessLicenseSearch", {
       controller: [
-        "BusinessLicenseRecords",
+        "BusinessLicenseApi",
         "$filter",
         "NgTableParams",
         SearchController],
       templateUrl: "business-license-search.html"
     });
 
-  function SearchController(BusinessLicenseRecords, $filter, NgTableParams) {
+  function SearchController(BusinessLicenseApi, $filter, NgTableParams) {
     var ctrl = this;
 
     ctrl.$onInit = function() {
@@ -41,7 +41,7 @@
           }
         });
 
-      BusinessLicenseRecords.load().then(
+      BusinessLicenseApi.load().then(
         function success(response) {
           ctrl.records = response.data;
 
