@@ -15,8 +15,6 @@
     $routeProvider
       .when("/", {
         templateUrl: "index.html",
-        controller: "SearchController",
-        controllerAs: "vm"
       })
       .otherwise({
         redirectTo: "/"
@@ -29,91 +27,116 @@
 
   angular
     .module("businessLicenseSearch")
-    .controller("SearchController", [
-      "BusinessLicenseRecords",
-      "$filter",
-      "NgTableParams",
-      SearchController
+    .service("BusinessLicenseApi", [
+      "$http",
+      "BusinessLicenseSettings",
+      BusinessLicenseApi
     ]);
 
-  function SearchController(BusinessLicenseRecords, $filter, NgTableParams) {
-    //alias 'this' for more intuitive front-end access
-    var vm = this;
-    //viewmodel for the search form
-    vm.id = "";
-    vm.dba = "";
-    vm.address = "";
-    vm.category = "";
-    vm.ready = false;
-    vm.error = false;
-    //the local data cache
-    vm.records = undefined;
-    //the local data cache of unique business categories
-    vm.categories = undefined;
-    //viewmodel for the results table
-    vm.results = undefined;
-    vm.tableParams = undefined;
+  function BusinessLicenseApi($http, settings) {
+    this.load = function() {
+      var url = [settings.host, "resource", settings.id].join("/");
+      //max out the $limit for 2.0 endpoints
+      //https://dev.socrata.com/docs/queries/limit.html
+      var query = "?$limit=50000";
 
-    //reset the viewmodel's state
-    vm.reset = function() {
-      vm.id = "";
-      vm.dba = "";
-      vm.address = "";
-      vm.category = "";
-      vm.results = undefined;
-      vm.tableParams.reload();
+      return $http({
+        cache: true,
+        method: "GET",
+        url: url + query,
+        headers: { Accept: "application/json" }
+      });
     };
+  }
 
-    //execute a search with the current state of the viewmodel
-    vm.search = function() {
-      if (vm.id || vm.dba || vm.address || vm.category) {
-        var results = vm.records;
+})();
+(function() {
+  "use strict";
 
-        results = $filter("byId")(results, vm.id);
-        results = $filter("byDba")(results, vm.dba);
-        results = $filter("byAddress")(results, vm.address);
-        results = $filter("byCategory")(results, vm.category);
+  angular
+    .module("businessLicenseSearch")
+    .component("businessLicenseSearch", {
+      controller: [
+        "BusinessLicenseApi",
+        "$filter",
+        "NgTableParams",
+        SearchController],
+      templateUrl: "business-license-search.html"
+    });
 
-        vm.results = results;
-        vm.tableParams.reload();
-      }
-    };
-    
-    //called as the controller initializes
-    BusinessLicenseRecords.load().then(
-      function success(response) {
-        vm.records = response.data;
+  function SearchController(BusinessLicenseApi, $filter, NgTableParams) {
+    var ctrl = this;
 
-        vm.categories = vm.records.reduce(function(prev, current) {
-          if (prev.indexOf(current.business_type) < 0) {
-            prev.push(current.business_type);
-          }
-          return prev;
-        }, []).sort();
+    ctrl.$onInit = function() {
+      //viewmodel for the search form
+      ctrl.id = "";
+      ctrl.dba = "";
+      ctrl.address = "";
+      ctrl.category = "";
+      ctrl.ready = false;
+      ctrl.error = false;
+      ctrl.records = [];
 
-        vm.tableParams = new NgTableParams({
+      ctrl.tableParams = new NgTableParams({
           count: 0,
           sorting: {
             dba: "asc"
           }
         }, {
           counts: [],
-          total: (vm.results || []).length,
-          getData: function($defer, params) {
+          getData: function(params) {
             var orderedData = params.sorting()
-              ? $filter("orderBy")(vm.results, params.orderBy())
-              : vm.results
+              ? $filter("orderBy")(ctrl.results, params.orderBy())
+              : ctrl.results
 
-            $defer.resolve(orderedData);
+            return orderedData;
           }
         });
 
-        vm.ready = true;
-      },
-      function error(response) {
-        vm.error = true;
+      BusinessLicenseApi.load().then(
+        function success(response) {
+          ctrl.records = response.data;
+
+          ctrl.categories = ctrl.records.reduce(function(prev, current) {
+            if (prev.indexOf(current.business_type) < 0) {
+              prev.push(current.business_type);
+            }
+            return prev;
+          }, []).sort();
+          
+          ctrl.ready = true;
+        },
+        function error(response) {
+          ctrl.error = true;
+        }
+      );
+    };
+
+    //reset the viewmodel's state
+    ctrl.reset = function() {
+      ctrl.id = "";
+      ctrl.dba = "";
+      ctrl.address = "";
+      ctrl.category = "";
+      ctrl.results = undefined;
+      ctrl.tableParams.reload();
+    };
+
+    //execute a search with the current state of the viewmodel
+    ctrl.search = function() {
+      var results = [];
+
+      if (ctrl.id || ctrl.dba || ctrl.category || ctrl.address) {
+        results = ctrl.records;
+        results = $filter("filter")(results, { license_number: ctrl.id });
+        results = $filter("filter")(results, { dba: ctrl.dba });
+        results = $filter("filter")(results, { business_type: ctrl.category });
+        results = $filter("byAddress")(results, ctrl.address);
       }
-    );
+
+      ctrl.results = results;
+      ctrl.tableParams.reload();
+    };
   }
 })();
 (function() {
@@ -121,37 +144,8 @@
 
   angular
     .module("businessLicenseSearch")
-    .filter("byId", byId)
-    .filter("byDba", byDba)
     .filter("byAddress", byAddress)
-    .filter("byCategory", byCategory)
     .filter("replace", replace);
-
-  //filter the given array for items with a (partial) matching id
-  function byId() {
-    return function(inputs, id) {
-      if (id.length < 1)
-        return inputs;
-
-      return (inputs || []).filter(function(i) {
-        return i.license_number && i.license_number.indexOf(id) > -1;
-      });
-    }
-  }
-
-  //filter the given array for items with a (partial) matching dba
-  function byDba() {
-    return function(inputs, dba) {
-      if (dba.length < 1)
-        return inputs;
-
-      dba = dba.toLowerCase();
-
-      return (inputs || []).filter(function(i) {
-        return i.dba && i.dba.toLowerCase().indexOf(dba) > -1;
-      });
-    }
-  }
 
   //filter the given array for items with a (partial) matching address
   function byAddress() {
@@ -171,20 +165,6 @@
     }
   }
 
-  //filter the given array for items with a (partial) matching category
-  function byCategory() {
-    return function(inputs, category) {
-      if (category.length < 1)
-        return inputs;
-
-      category = category.toLowerCase();
-
-      return (inputs || []).filter(function (i) {
-        return i.business_type && i.business_type.toLowerCase().indexOf(category) === 0;
-      });
-    }
-  }
-
   //simple filter for string replacement using regex
   function replace() {
     return function(input, pattern, replacement) {
@@ -192,26 +172,4 @@
       return input.replace(regex, replacement);
     };
   }
-})();
-(function() {
-  "use strict";
-
-  angular
-    .module("businessLicenseSearch")
-    .service("BusinessLicenseRecords", [
-      "$http",
-      "BusinessLicenseSettings",
-      BusinessLicenseRecords
-    ]);
-
-  function BusinessLicenseRecords($http, settings) {
-    this.load = function() {
-      return $http({
-        method: "GET",
-        url: [settings.host, "resource", settings.id].join("/"),
-        headers: { Accept: "application/json" }
-      });
-    };
-  }
-
 })();
