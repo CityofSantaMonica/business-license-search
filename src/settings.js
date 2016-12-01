@@ -7,7 +7,7 @@
 
   function BusinessLicenseSettings() {
     this.host = "https://data.smgov.net";
-    this.id = "q2mx-26rp";
+    this.id = "gfc6-tnen";
   }
 
 })();
