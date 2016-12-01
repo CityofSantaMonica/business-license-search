@@ -73,12 +73,12 @@
         }, {
           counts: [],
           total: (vm.results || []).length,
-          getData: function($defer, params) {
+          getData: function(params) {
             var orderedData = params.sorting()
               ? $filter("orderBy")(vm.results, params.orderBy())
               : vm.results
 
-            $defer.resolve(orderedData);
+            return orderedData;
           }
         });
 
