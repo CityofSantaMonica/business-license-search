@@ -15,8 +15,6 @@
     $routeProvider
       .when("/", {
         templateUrl: "index.html",
-        controller: "SearchController",
-        controllerAs: "vm"
       })
       .otherwise({
         redirectTo: "/"
