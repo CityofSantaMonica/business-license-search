@@ -2,7 +2,7 @@
     <span class="glyphicon glyphicon-refresh glyphicon-spin"></span> Loading data (this may take up to 30 seconds)...
 </p>
 
-<p class="alert alert-warning" ng-show="$ctrl.results && $ctrl.results.length == 0">
+<p class="alert alert-warning" ng-show="$ctrl.results() && $ctrl.results().length == 0">
     No results match your search.
 </p>
 
@@ -34,11 +34,11 @@
     <div class="form-group">
         <button type="button" class="btn btn-primary" ng-click="$ctrl.search()">Search</button>
         <button type="button" class="btn btn-default" ng-click="$ctrl.reset()">Clear</button>
-        <button type="button" class="btn btn-secondary pull-right" ng-show="$ctrl.results && $ctrl.results.length > 0" ng-csv="$ctrl.results" csv-header="['License Number', 'Business Name', 'Address', 'City', 'State', 'Zip', 'Business Category']" filename="business-licenses.csv">Export to CSV</button>
+        <button type="button" class="btn btn-secondary pull-right" ng-show="$ctrl.hasResults()" ng-csv="$ctrl.results" csv-header="['License Number', 'Business Name', 'Address', 'City', 'State', 'Zip', 'Business Category']" filename="business-licenses.csv">Export to CSV</button>
     </div>
 </div>
 
-<div ng-show="$ctrl.results && $ctrl.results.length > 0">
+<div ng-show="$ctrl.hasResults()">
     <h2>Results</h2>
     <table class="table-custom table table-striped" ng-table="$ctrl.tableParams">
         <tr ng-repeat="business in $data">
