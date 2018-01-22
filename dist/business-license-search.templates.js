@@ -9,7 +9,7 @@ $templateCache.put("business-license-search.html","<p class=\"alert alert-info f
     "    <span class=\"glyphicon glyphicon-refresh glyphicon-spin\"></span> Loading data (this may take up to 30 seconds)...\n" +
     "</p>\n" +
     "\n" +
-    "<p class=\"alert alert-warning\" ng-show=\"$ctrl.results && $ctrl.results.length == 0\">\n" +
+    "<p class=\"alert alert-warning\" ng-show=\"$ctrl.results() && $ctrl.results().length == 0\">\n" +
     "    No results match your search.\n" +
     "</p>\n" +
     "\n" +
@@ -41,11 +41,11 @@ $templateCache.put("business-license-search.html","<p class=\"alert alert-info f
     "    <div class=\"form-group\">\n" +
     "        <button type=\"button\" class=\"btn btn-primary\" ng-click=\"$ctrl.search()\">Search</button>\n" +
     "        <button type=\"button\" class=\"btn btn-default\" ng-click=\"$ctrl.reset()\">Clear</button>\n" +
-    "        <button type=\"button\" class=\"btn btn-secondary pull-right\" ng-show=\"$ctrl.results && $ctrl.results.length > 0\" ng-csv=\"$ctrl.results\" csv-header=\"['License Number', 'Business Name', 'Address', 'City', 'State', 'Zip', 'Business Category']\" filename=\"business-licenses.csv\">Export to CSV</button>\n" +
+    "        <button type=\"button\" class=\"btn btn-secondary pull-right\" ng-show=\"$ctrl.hasResults()\" ng-csv=\"$ctrl.results\" csv-header=\"['License Number', 'Business Name', 'Address', 'City', 'State', 'Zip', 'Business Category']\" filename=\"business-licenses.csv\">Export to CSV</button>\n" +
     "    </div>\n" +
     "</div>\n" +
     "\n" +
-    "<div ng-show=\"$ctrl.results && $ctrl.results.length > 0\">\n" +
+    "<div ng-show=\"$ctrl.hasResults()\">\n" +
     "    <h2>Results</h2>\n" +
     "    <table class=\"table-custom table table-striped\" ng-table=\"$ctrl.tableParams\">\n" +
     "        <tr ng-repeat=\"business in $data\">\n" +
@@ -64,7 +64,8 @@ $templateCache.put("business-license-search.html","<p class=\"alert alert-info f
     "            </td>\n" +
     "        </tr>\n" +
     "    </table>\n" +
-    "</div>")
+    "</div>\n" +
+    "")
 
 $templateCache.put("index.html","<business-license-search></business-license-search>")
 }]);

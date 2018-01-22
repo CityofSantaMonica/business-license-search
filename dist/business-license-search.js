@@ -86,8 +86,8 @@
           counts: [],
           getData: function(params) {
             var orderedData = params.sorting()
-              ? $filter("orderBy")(ctrl.results, params.orderBy())
-              : ctrl.results
+              ? $filter("orderBy")(ctrl.results(), params.orderBy())
+              : ctrl.results()
 
             return orderedData;
           }
@@ -103,7 +103,7 @@
             }
             return prev;
           }, []).sort();
-          
+
           ctrl.ready = true;
         },
         function error(response) {
@@ -112,13 +112,36 @@
       );
     };
 
+    //calculate results for the current state of the viewmodel
+    ctrl.results = function() {
+      if (ctrl._results) {
+        return ctrl._results.map(function(r) {
+            return {
+              license_number: r.license_number,
+              dba: r.dba,
+              address: r.address,
+              city: r.city,
+              state: r.state,
+              zip_code: r.zip_code,
+              business_type: r.business_type,
+            };
+        });
+      }
+      return undefined;
+    }
+
+    //determine if the viewmodel has filtered results
+    ctrl.hasResults = function() {
+      return ctrl.results() && ctrl.results().length > 0;
+    }
+
     //reset the viewmodel's state
     ctrl.reset = function() {
       ctrl.id = "";
       ctrl.dba = "";
       ctrl.address = "";
       ctrl.category = "";
-      ctrl.results = undefined;
+      ctrl._results = undefined;
       ctrl.tableParams.reload();
     };
 
@@ -134,11 +157,12 @@
         results = $filter("byAddress")(results, ctrl.address);
       }
 
-      ctrl.results = results;
+      ctrl._results = results;
       ctrl.tableParams.reload();
     };
   }
 })();
+
 (function() {
   "use strict";
 
